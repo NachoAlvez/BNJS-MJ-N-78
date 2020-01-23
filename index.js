@@ -86,15 +86,18 @@ if (datos.consulta.nombre == ""){
         rta: "Error",
         msg: "Ingrese un mensaje entre 50 y 200 caracteres"
     })
-} else {
-    //Envio de mail..
+} else 
     miniOutlook.sendMail({
-	    from : datos.consulta.correo,
-	    to : "nnacho.alvez@hotmail.com",
-	    subject : datos.consulta.asunto,
-	    html : "<strong>" + datos.consulta.mensaje + "</strong>"
+	from : datos.consulta.correo,
+	to : "nnacho.alvez@hotmail.com",
+	subject : datos.consulta.asunto,
+	html : "<strong>" + datos.consulta.mensaje + "</strong>"
 	})
-    response.json( datos )
+response.json( datos )
 
-}
+})
+
+
 //tarea 2) definir un msj si sale bien o si sale mal en el response
+	
+//Envio de mail...
