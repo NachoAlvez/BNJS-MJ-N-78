@@ -55,16 +55,46 @@ server.post("/enviar", function(request, response){
         consulta : request.body
 	}
 
-	//tarea 1) validar que no esten vacios antes de enviar el mail
-	//tarea 2) definir un msj si sale bien o si sale mal en el response
-	
-	//Envio de mail...
-	miniOutlook.sendMail({
-		from : datos.consulta.correo,
-		to : "nnacho.alvez@gmail.com"
-		subject : datos.consulta.asunto,
-		html : "<strong>" + datos.consulta.mensaje + "</strong>"
+//tarea 1) validar que no esten vacios antes de enviar el mail
+
+if (datos.consulta.nombre == ""){
+
+    response.json({
+        rta: "Error",
+        msg: "El nombre no puede estar vacio"
+    })
+
+} else if(datos.consulta.correo == "" || datos.consulta.correo.indexOf("@") == -1){
+
+    response.json({
+        rta: "Error",
+        msg: "Ingrese un correo valido"
+    })
+
+
+
+} else if( datos.consulta.asunto == ""){
+
+    response.json({
+
+        rta: "Error",
+        msg: "Elija un asunto"
+    })
+} else if (datos.consulta.mensaje.length < 50 || datos.consulta.mensaje.length > 200){
+
+    response.json ({
+        rta: "Error",
+        msg: "Ingrese un mensaje entre 50 y 200 caracteres"
+    })
+} else {
+    //Envio de mail..
+    miniOutlook.sendMail({
+	    from : datos.consulta.correo,
+	    to : "nnacho.alvez@hotmail.com",
+	    subject : datos.consulta.asunto,
+	    html : "<strong>" + datos.consulta.mensaje + "</strong>"
 	})
     response.json( datos )
 
-})
+}
+//tarea 2) definir un msj si sale bien o si sale mal en el response
