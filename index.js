@@ -1,6 +1,9 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 const nodemailer = require("nodemailer")
+const multer = require("multer")
+
+
 
 /* INICIO CONFIGS NODEMAILER */
 /*1) Configurar los datos del servidor de email */
@@ -39,6 +42,8 @@ const public = express.static("public")
 const json = bodyParser.json()
 
 const urlencoded = bodyParser.urlencoded({ extended : false })
+
+const upload = multer()
 /* buscar archivos estaticos en el directorio /public*/
 
 server.use( public )
@@ -46,6 +51,8 @@ server.use( public )
 server.use( json )
 
 server.use( urlencoded )
+
+server.use( upload.array() )
 
 server.listen( port )
 /*Ejecutar endpoints customizados */
@@ -56,15 +63,18 @@ server.post("/enviar", function(request, response){
 	}
 
 //tarea 1) validar que no esten vacios antes de enviar el mail
+//aca deberia validar
 
-if (datos.consulta.nombre == ""){
+//tarea : Implementar el modulo joi para validar esquema de datos 
+//http:github
+if (datos.consulta.nombre == ""  || datos.consulta.nombre == null){
 
     response.json({
         rta: "Error",
         msg: "El nombre no puede estar vacio"
     })
 
-} else if(datos.consulta.correo == "" || datos.consulta.correo.indexOf("@") == -1){
+} else if(datos.consulta.correo == "" || datos.consulta.correo.indexOf("@") == -1 || datos.consulta.correo == null){
 
     response.json({
         rta: "Error",
@@ -73,14 +83,14 @@ if (datos.consulta.nombre == ""){
 
 
 
-} else if( datos.consulta.asunto == ""){
+} else if( datos.consulta.asunto == "" || datos.consulta.asunto == null){
 
     response.json({
 
         rta: "Error",
         msg: "Elija un asunto"
     })
-} else if (datos.consulta.mensaje.length < 50 || datos.consulta.mensaje.length > 200){
+} else if (datos.consulta.mensaje.length < 50 || datos.consulta.mensaje.length > 200 || datos.consulta.mensaje.length == null){
 
     response.json ({
         rta: "Error",
