@@ -2,7 +2,8 @@ const express = require("express")
 const bodyParser = require("body-parser")
 const nodemailer = require("nodemailer")
 const multer = require("multer")
-
+const joi = require("@hapi/joi")
+const hbs = require("nodemailer-express-handlebars")
 
 
 /* INICIO CONFIGS NODEMAILER */
@@ -11,8 +12,8 @@ const miniOutlook = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
     auth: {
-        user: 'wilfrid.johnston85@ethereal.email',
-        pass: 'GWxGxZ4kW99Qy8RUgP'
+        user: 'hyman.mraz@ethereal.email',
+        pass: 'u3YEJ156Rs9bFZ4HBt'
     }
 });
 
@@ -31,6 +32,18 @@ miniOutlook.verify(function(error, ok){
     }
 
 })
+//3) Asignar motor de plantilla "Handlebars"
+const render = {
+    viewEngine :{
+        layoutsDir :"templates/",
+        partialsDir : "templates/",
+        defaultLayout : false,
+        extName : ".hbs"
+    },
+    viewPath : "templates/",
+    extName : ".hbs"
+}
+miniOutlook.use("compile", hbs(render))
 
 /* FIN DE CONFIGS NODEMAILER */
 const server = express()
@@ -65,8 +78,51 @@ server.post("/enviar", function(request, response){
 //tarea 1) validar que no esten vacios antes de enviar el mail
 //aca deberia validar
 
-//tarea : Implementar el modulo joi para validar esquema de datos 
-//http:github
+//tarea : Implementar el sistema de plantillas handlebars + envio del email 
+//https://www.npmjs.com/package/nodemailer-express-handlebars
+
+const schema = joi.object({
+    nombre :joi.string().alphanum().min(4).max(25).required(),
+    correo :joi.string().email({
+        minDomainSegments : 2, 
+        tlds : {
+            allow : ["com","net", "org"]
+        }
+        }).required(),
+    asunto : joi.string().alphanum().valid("ax45", "ax38", "ax67", "ax14").required(),
+    mensaje :joi.string().min(50).max(200).required(),
+    fecha : joi.date().timestamp("unix")
+})
+
+let validacion = schema.validate(datos.consulta)
+
+if ( validacion.error ){
+    response.json( validacion.error )
+
+} else {
+    miniOutlook.sendMail({
+        from : datos.consulta.correo,
+        to : "nnacho.alvez@hotmail.com",
+        subject : datos.consulta.asunto,
+       // html : "<strong>" + datos.consulta.mensaje + "</strong>"
+        template : "prueba",
+        context : datos.consulta
+
+        }, function(error, info){
+ 
+            let msg = error ? "Su consulta no pudo ser enviada :'(" : "Gracias por su consulta :D"
+
+            response.json ({msg})
+
+        })
+
+}
+
+response.json({ msg : "Gracias por su consulta!"})
+
+response.end("mira la consola...")
+
+/*
 if (datos.consulta.nombre == ""  || datos.consulta.nombre == null){
 
     response.json({
@@ -102,8 +158,10 @@ if (datos.consulta.nombre == ""  || datos.consulta.nombre == null){
 	to : "nnacho.alvez@hotmail.com",
 	subject : datos.consulta.asunto,
 	html : "<strong>" + datos.consulta.mensaje + "</strong>"
-	})
-response.json( datos )
+    })
+    
+    */
+//response.json( datos )
 
 })
 

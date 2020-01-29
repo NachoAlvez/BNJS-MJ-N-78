@@ -44,10 +44,10 @@
 			formulario.onsubmit = function(evento){
 				evento.preventDefault()
 
-				let ahora = new date()
+				let ahora = new Date()
 				let datos = new FormData(this)
 
-				datos.append("fecha", "ahora.toString"())
+				datos.append("fecha", ahora.valueOf())
 
 				//Enviar datos asincronicamente...
 				fetch( this.action, {
@@ -58,7 +58,9 @@
 
 				}).then(function(server){
 
+					console.clear()
 					alert(server.msg)
+					console.log(server)
 
 				})
 			}
