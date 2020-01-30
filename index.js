@@ -97,7 +97,7 @@ const schema = joi.object({
 let validacion = schema.validate(datos.consulta)
 
 if ( validacion.error ){
-    response.json( validacion.error )
+    response.json({ msg : validacion.error.details[0].message } )
 
 } else {
     miniOutlook.sendMail({
